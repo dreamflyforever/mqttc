@@ -60,7 +60,7 @@ static: $(STLIBNAME)
 
 # Binaries:
 mqttc: client.c client.h $(STLIBNAME)
-	$(CC) -o $@ $(REAL_CFLAGS) $(REAL_LDFLAGS) client.c $(STLIBNAME)
+	$(CC) -o $@ $(REAL_CFLAGS) $(REAL_LDFLAGS) client.c $(STLIBNAME) -lpthread
 
 .c.o:
 	$(CC) -std=c99 -pedantic -c $(REAL_CFLAGS) $<

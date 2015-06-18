@@ -7,6 +7,7 @@ usage
 =====
 
 mqttc -h host -p port -u username -P password -k keepalive
+(publish mac 1 macaddress)
 
 command
 =======

@@ -49,6 +49,9 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "ae.h"
 #include "anet.h"
@@ -316,7 +319,7 @@ client_read(aeEventLoop *el, int fd, void *clientdata, int mask) {
 	}
 	if(!strncmp(buffer, "help", 4) || !strncmp(buffer, "?", 1)) {
 		print_help();
-	} else if(!strncmp(buffer, "subscribe ", strlen("subscribe "))) {
+	} else if (!strncmp(buffer, "subscribe ", strlen("subscribe "))) {
 		argc = setargs(buffer+strlen("subscribe "), argv); 
 		if(argc == 2) {
 			mqtt_subscribe(client.mqtt, argv[0], atoi(argv[1]));
@@ -368,10 +371,10 @@ client_setup(int argc, char **argv) {
         case 'u':
 			mqtt_set_username(mqtt, optarg);
             break;
-		case 'P':
+	case 'P':
 			mqtt_set_passwd(mqtt, optarg);
             break;
-		case 'k':
+	case 'k':
 			mqtt_set_keepalive(mqtt, atoi(optarg));
 			break;
 		case 'H':
@@ -380,6 +383,28 @@ client_setup(int argc, char **argv) {
 		}
     }
 	if(!mqtt->server) mqtt_set_server(mqtt, "localhost");
+}
+
+pthread_t thread;
+
+void thread_create(Mqtt *mqtt)
+{
+	int tmp;
+	memset(&thread, 0, sizeof(thread));
+	tmp = pthread_create(&thread, NULL, mqtt_run, (Mqtt *)mqtt);
+	if(tmp != 0) {
+		printf("create success\n");
+	} else {
+		printf("create fail\n");
+	}
+}
+
+void thread_wait(void)
+{
+	if(thread !=0) {
+		pthread_join(thread,NULL);
+		printf("maqq thread over\n");
+	}
 }
 
 int main(int argc, char **argv) {
@@ -397,11 +422,18 @@ int main(int argc, char **argv) {
 	set_callbacks(client.mqtt);
 	
 	if(mqtt_connect(client.mqtt) < 0) {
-        printf("mqttc connect failed.\n");
-        exit(-1);
-    }
+        	printf("mqttc connect failed.\n");
+        	exit(-1);
+	}
 
-	mqtt_run(client.mqtt);
+	mqtt_subscribe(client.mqtt, "mac", 1);
+	thread_create(client.mqtt);
+	//mqtt_run(client.mqtt);
+	while (1) {
+		printf("Sleep....\n");
+		sleep(2);
+	}
+	fprintf(stderr, "hello world\n");
 
 	return 0;
 }

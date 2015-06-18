@@ -41,6 +41,7 @@
 #include <sys/uio.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <pthread.h>
 
 #include "ae.h"
 #include "anet.h"
@@ -486,9 +487,11 @@ _mqtt_sleep(struct aeEventLoop *evtloop) {
 
 void 
 mqtt_run(Mqtt *mqtt) {
+	printf("gogogo\n");
     aeSetBeforeSleepProc(mqtt->el, _mqtt_sleep);
     aeMain(mqtt->el);
     aeDeleteEventLoop(mqtt->el);
+	pthread_exit(NULL);
 }
 
 //RELEASE
