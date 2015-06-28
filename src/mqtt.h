@@ -178,7 +178,7 @@ void mqtt_clear_will(Mqtt *mqtt);
 
 void mqtt_set_keepalive(Mqtt *mqtt, int keepalive);
 
-void mqtt_set_callback(Mqtt *mqtt, uint8_t type, MqttCallback callback); 
+void mqtt_set_callback(Mqtt *mqtt, int8_t type, MqttCallback callback); 
 
 void mqtt_clear_callback(Mqtt *mqtt, uint8_t type);
 
@@ -217,7 +217,7 @@ void mqtt_ping(Mqtt *mqtt);
 void mqtt_disconnect(Mqtt *mqtt);
 
 //RUN Loop
-void mqtt_run(Mqtt *mqtt);
+void *mqtt_run(void *mqtt);
 
 //RELEASE
 void mqtt_release(Mqtt *mqtt);
@@ -230,7 +230,7 @@ void mqtt_will_release(MqttWill *will);
 //Message create and release
 MqttMsg * mqtt_msg_new(int msgid, int qos, bool retain, bool dup, char *topic, int payloadlen, char *payload);
 
-const char* mqtt_msg_name(uint8_t type);
+const char* mqtt_msg_name(int8_t type);
 
 void mqtt_msg_free(MqttMsg *msg);
 

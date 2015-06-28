@@ -143,7 +143,7 @@ mqtt_set_keepalive(Mqtt *mqtt, int keepalive) {
 }
 
 void 
-mqtt_set_callback(Mqtt *mqtt, uint8_t type, MqttCallback callback) {
+mqtt_set_callback(Mqtt *mqtt, int8_t type, MqttCallback callback) {
 	if(type < 0) return;
 	type = (type >> 4) & 0x0F;
 	if(type > 16) return;
@@ -449,7 +449,7 @@ mqtt_unsubscribe(Mqtt *mqtt, const char *topic) {
 
 static void 
 _mqtt_send_ping(Mqtt *mqtt) {
-	char buffer[2] = {PINGREQ, 0};
+	char buffer[2] = {(char)PINGREQ, 0};
 	anetWrite(mqtt->fd, buffer, 2);
 }
 
@@ -462,7 +462,7 @@ mqtt_ping(Mqtt *mqtt) {
 
 static void 
 _mqtt_send_disconnect(Mqtt *mqtt) {
-	char buffer[2] = {DISCONNECT, 0};
+	char buffer[2] = {(char)DISCONNECT, 0};
 	anetWrite(mqtt->fd, buffer, 2);
 }
 
@@ -485,9 +485,9 @@ _mqtt_sleep(struct aeEventLoop *evtloop) {
 	//what to do?
 }
 
-void 
-mqtt_run(Mqtt *mqtt) {
+void *mqtt_run(void *mt) {
 	printf("gogogo\n");
+	Mqtt *mqtt = mt;
     aeSetBeforeSleepProc(mqtt->el, _mqtt_sleep);
     aeMain(mqtt->el);
     aeDeleteEventLoop(mqtt->el);
@@ -714,9 +714,9 @@ static const char* msg_names[] = {
 	"DISCONNECT"
 };
 
-const char* mqtt_msg_name(uint8_t type) {
+const char *mqtt_msg_name(int8_t type) {
 	type = (type >> 4) & 0x0F;
-	return (type >= 0 && type <= DISCONNECT) ? msg_names[type] : "UNKNOWN";
+	return msg_names[type];
 }
 
 void 

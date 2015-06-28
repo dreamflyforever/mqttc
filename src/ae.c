@@ -383,7 +383,7 @@ void aeMain(aeEventLoop *eventLoop) {
     }
 }
 
-char *aeGetApiName(void) {
+const char *aeGetApiName(void) {
     return aeApiName();
 }
 

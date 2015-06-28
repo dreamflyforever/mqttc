@@ -72,25 +72,36 @@ static const char *COMMANDS[3] = {
 	"unsubscribe topic\n"
 };
 
-static void
-print_usage() {
+static void print_usage(void) {
 	printf("usage: mqttc -h host -p port -u username -P password -k keepalive\n");
 }
 
 static void 
-print_prompt() {
-	write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+print_prompt(void) {
+	int ret;
+	ret = write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+	if (ret == 0) {
+		/*TODO:*/
+	}
 }
 
 static void
-print_help() {
+print_help(void) {
 	int i;
+	int ret;
 	const char *cmd;
 	const char *help = "commands are: \n";
-	write(STDOUT_FILENO, help, strlen(help));
+	ret = write(STDOUT_FILENO, help, strlen(help));
+	if (ret == 0) {
+		/*TODO:*/
+	}
+
 	for(i = 0; i < 3; i++) {
 		cmd = COMMANDS[i];
-		write(STDOUT_FILENO, cmd, strlen(cmd));
+		ret = write(STDOUT_FILENO, cmd, strlen(cmd));
+		if (ret == 0) {
+			/*TODO:*/
+		}
 	}
 }
 
@@ -106,8 +117,7 @@ client_cron(aeEventLoop *el, long long id, void *clientData) {
     return 1000;
 }
 
-static void
-client_prepare() {
+static void client_prepare(void) {
     srand(time(NULL)^getpid());
 }
 
@@ -126,7 +136,7 @@ mqtt_init(Mqtt *mqtt) {
 }
 
 static void
-client_init() {
+client_init(void) {
 	aeEventLoop *el;
 	el = aeCreateEventLoop();
 	client.el = el;
@@ -346,13 +356,16 @@ client_read(aeEventLoop *el, int fd, void *clientdata, int mask) {
 	} else if (!strncmp(buffer, "\n", 1)){
 		//ignore
 	} else {
-		write(STDOUT_FILENO, badcmd, strlen(badcmd));
+		int ret = write(STDOUT_FILENO, badcmd, strlen(badcmd));
+		if (ret == 0) {
+			/*TODO:*/
+		}
 	}
 	print_prompt();
 }
 
 static void
-client_open() {
+client_open(void) {
 	aeCreateFileEvent(client.el, STDIN_FILENO, AE_READABLE, client_read, &client);
 }
 
@@ -387,15 +400,15 @@ client_setup(int argc, char **argv) {
 
 pthread_t thread;
 
-void thread_create(Mqtt *mqtt)
+void thread_create(void *mqtt)
 {
 	int tmp;
 	memset(&thread, 0, sizeof(thread));
-	tmp = pthread_create(&thread, NULL, mqtt_run, (Mqtt *)mqtt);
+	tmp = pthread_create(&thread, NULL, mqtt_run, mqtt);
 	if(tmp != 0) {
 		printf("create success\n");
 	} else {
-		printf("create fail\n");
+		printf("create fail retvalue: %d\n", tmp);
 	}
 }
 
@@ -426,15 +439,13 @@ int main(int argc, char **argv) {
         	exit(-1);
 	}
 
-	mqtt_subscribe(client.mqtt, "mac", 1);
+	mqtt_subscribe(client.mqtt, "lapsule/00c12b000a6a", 0);
 	thread_create(client.mqtt);
 	//mqtt_run(client.mqtt);
 	while (1) {
-		printf("Sleep....\n");
 		sleep(2);
 	}
 	fprintf(stderr, "hello world\n");
 
 	return 0;
 }
-
