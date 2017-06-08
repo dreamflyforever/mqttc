@@ -486,7 +486,6 @@ _mqtt_sleep(struct aeEventLoop *evtloop) {
 }
 
 void *mqtt_run(void *mt) {
-	printf("gogogo\n");
 	Mqtt *mqtt = mt;
     aeSetBeforeSleepProc(mqtt->el, _mqtt_sleep);
     aeMain(mqtt->el);

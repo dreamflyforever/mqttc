@@ -405,7 +405,7 @@ void thread_create(void *mqtt)
 	int tmp;
 	memset(&thread, 0, sizeof(thread));
 	tmp = pthread_create(&thread, NULL, mqtt_run, mqtt);
-	if(tmp != 0) {
+	if(tmp == 0) {
 		printf("create success\n");
 	} else {
 		printf("create fail retvalue: %d\n", tmp);
@@ -420,7 +420,8 @@ void thread_wait(void)
 	}
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	client_prepare();
 	//init
 	client_init();
@@ -444,6 +445,13 @@ int main(int argc, char **argv) {
 	//mqtt_run(client.mqtt);
 	while (1) {
 		sleep(2);
+		MqttMsg *msg;
+
+		msg = mqtt_msg_new(0, 0, false, false,
+			zstrdup("lapsule/00c12b000a6a"), strlen("test"), zstrdup("test"));
+		mqtt_publish(client.mqtt, msg);
+		mqtt_msg_free(msg);
+
 	}
 	fprintf(stderr, "hello world\n");
 
